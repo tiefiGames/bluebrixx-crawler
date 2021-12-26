@@ -86,7 +86,7 @@ public class BlueBrixxCrawler {
             case "ANKÜNDIGUNG":
                 return ProductStatus.ANNOUNCEMENT;
             default:
-                return ProductStatus.AVAILABLE;
+                return ProductStatus.UNKNOWN;
         }
     }
 
