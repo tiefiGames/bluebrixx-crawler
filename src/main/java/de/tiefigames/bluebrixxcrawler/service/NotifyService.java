@@ -91,7 +91,7 @@ public class NotifyService {
                     // Remove Notify after inform user
                     notifyRepository.delete(notify);
                 }
-                Thread.sleep((long) (Math.random() * (6000 - 3000) + 3000));
+                Thread.sleep((long) (Math.random() * (3000 - 1500) + 1500));
             }
         } catch (TimeoutException e) {
             logger.info("Got Timeout by checking notified Product");
