@@ -1,0 +1,21 @@
+version: '3.3'
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    environment:
+      MYSQL_DATABASE: 'bluebrixx_crawler_db'
+      MYSQL_USER: 'test'
+      MYSQL_PASSWORD: 'test'
+      MYSQL_ROOT_PASSWORD: '8gXxkmhRGkuo664WEaLjnSHMqeFzPzyK'
+    ports:
+      - '3306:3306'
+    volumes:
+      - bluebrixx-crawler-db-volume:/var/lib/mysql
+    networks:
+      - bbrixx_network
+volumes:
+  bluebrixx-crawler-db-volume:
+networks:
+  bbrixx_network:
+    external: true

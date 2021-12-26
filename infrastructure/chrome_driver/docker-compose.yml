@@ -1,0 +1,12 @@
+version: '3.3'
+services:
+  chrome:
+    image: selenium/standalone-chrome:96.0
+    restart: always
+    ports:
+      - '4444:4444'
+    networks:
+      - bbrixx_network
+networks:
+  bbrixx_network:
+    external: true
