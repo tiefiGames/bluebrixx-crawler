@@ -79,9 +79,8 @@ public class TelegramBotClient extends TelegramLongPollingBot {
             List<Notify> notifyList = notifyService.getWatchlist();
             StringBuilder builder = new StringBuilder("Watchlist:\n\n");
             for (Notify notify : notifyList) {
-                builder.append(String.format("Set: %s\nSetnumber: %s\nStatus: %s\nNotify_ID: %s\n%s\n\n", notify.getProduct().getName(),
-                        notify.getProduct().getSetNumber(), notify.getProduct().getProductStatus(), notify.getId(),
-                        notify.getProduct().getUrl()));
+                builder.append(String.format("Set: %s\nSetnumber: %s\n\n", notify.getProduct().getName(),
+                        notify.getProduct().getSetNumber()));
             }
             sendMessage(builder.toString());
         }
