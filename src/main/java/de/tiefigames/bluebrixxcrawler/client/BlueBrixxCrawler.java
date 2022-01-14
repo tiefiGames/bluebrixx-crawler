@@ -71,7 +71,7 @@ public class BlueBrixxCrawler {
 
     private ProductStatus getProductStatus() {
         try {
-            webDriver.findElement(By.className("informAvailable"));
+            webDriver.findElement(By.className("informAvailable_button_container"));
         } catch (NoSuchElementException ex) {
             return ProductStatus.AVAILABLE;
         }
