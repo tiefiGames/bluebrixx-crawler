@@ -1,10 +1,11 @@
 version: '3.3'
 services:
   chrome:
-    image: selenium/standalone-chrome:96.0
+    image: selenium/standalone-chrome:97.0
     restart: always
     ports:
       - '4444:4444'
+    shm_size: '2gb'
     networks:
       - bbrixx_network
 networks:

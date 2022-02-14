@@ -61,37 +61,38 @@ public class NotifyService {
         return notify;
     }
 
-    @Scheduled(fixedRate = 60000)
+    @Scheduled(cron = "* */4 7-18 * * MON-SAT")
     private void checkNotifies() throws InterruptedException {
-        logger.info("Start check notified Product availability");
-
         try {
             List<Notify> notifyList = (List<Notify>) notifyRepository.findAll();
-            for (Notify notify : notifyList) {
-                logger.info("Check notify with id {} and setnumber {}", notify.getId(), notify.getProduct().getSetNumber());
-                ProductStatus productStatus = blueBrixxCrawler.getProductStatus(notify.getProduct().getUrl());
-                if (productStatus == ProductStatus.AVAILABLE) {
-                    logger.info("Status changed for notify id {} from {} to {}", notify.getId(), notify.getProduct().getProductStatus(), productStatus);
+            if (!notifyList.isEmpty()) {
+                logger.info("Start check notified Product availability");
+                for (Notify notify : notifyList) {
+                    logger.info("Check notify with id {} and setnumber {}", notify.getId(), notify.getProduct().getSetNumber());
+                    ProductStatus productStatus = blueBrixxCrawler.getProductStatus(notify.getProduct().getUrl());
+                    if (productStatus == ProductStatus.AVAILABLE) {
+                        logger.info("Status changed for notify id {} from {} to {}", notify.getId(), notify.getProduct().getProductStatus(), productStatus);
 
-                    // Save ChangeHistory
-                    ChangeHistory changeHistory = new ChangeHistory();
-                    changeHistory.setCreated(LocalDateTime.now());
-                    changeHistory.setOldProductstatus(notify.getProduct().getProductStatus());
-                    changeHistory.setNewProductstatus(productStatus);
-                    changeHistory.setProduct(notify.getProduct());
-                    changeHistoryRepository.save(changeHistory);
+                        // Save ChangeHistory
+                        ChangeHistory changeHistory = new ChangeHistory();
+                        changeHistory.setCreated(LocalDateTime.now());
+                        changeHistory.setOldProductstatus(notify.getProduct().getProductStatus());
+                        changeHistory.setNewProductstatus(productStatus);
+                        changeHistory.setProduct(notify.getProduct());
+                        changeHistoryRepository.save(changeHistory);
 
-                    // Set new Status for Product
-                    notify.getProduct().setProductStatus(productStatus);
+                        // Set new Status for Product
+                        notify.getProduct().setProductStatus(productStatus);
 
-                    // send message to Telegram
-                    String message = String.format("AVAILABLE: Set %s with number %s\n %s", notify.getProduct().getName(), notify.getProduct().getSetNumber(), notify.getProduct().getUrl());
-                    telegramBotService.sendMessage(message);
+                        // send message to Telegram
+                        String message = String.format("AVAILABLE: Set %s with number %s\n %s", notify.getProduct().getName(), notify.getProduct().getSetNumber(), notify.getProduct().getUrl());
+                        telegramBotService.sendMessage(message);
 
-                    // Remove Notify after inform user
-                    notifyRepository.delete(notify);
+                        // Remove Notify after inform user
+                        notifyRepository.delete(notify);
+                    }
+                    Thread.sleep((long) (Math.random() * (3000 - 1500) + 1500));
                 }
-                Thread.sleep((long) (Math.random() * (3000 - 1500) + 1500));
             }
         } catch (TimeoutException e) {
             logger.info("Got Timeout by checking notified Product");

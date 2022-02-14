@@ -3,6 +3,7 @@ package de.tiefigames.bluebrixxcrawler.client;
 import de.tiefigames.bluebrixxcrawler.entity.Product;
 import de.tiefigames.bluebrixxcrawler.entity.ProductStatus;
 import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebDriver;
 import org.slf4j.Logger;
@@ -27,10 +28,16 @@ public class BlueBrixxCrawler {
     @Value("${chrome.driver.url}")
     private String driverUrl;
 
+    @Value("${proxy.url}")
+    private String proxyUrl;
+
     public synchronized Product getProduct(String productUrl) {
         try {
             initializeWebDriver();
-            webDriver.get(productUrl);
+
+            webDriver.get(proxyUrl);
+            webDriver.findElement(By.xpath("(//input[@placeholder='Enter Url'])[1]")).sendKeys(productUrl);
+            webDriver.findElement(By.xpath("(//button)[1]")).click();
 
             Product product = new Product();
             product.setUrl(productUrl);
@@ -57,7 +64,11 @@ public class BlueBrixxCrawler {
     public synchronized ProductStatus getProductStatus(String productUrl) {
         try {
             initializeWebDriver();
-            webDriver.get(productUrl);
+
+            webDriver.get(proxyUrl);
+            webDriver.findElement(By.xpath("(//input[@placeholder='Enter Url'])[1]")).sendKeys(productUrl);
+            webDriver.findElement(By.xpath("(//button)[1]")).click();
+
             ProductStatus productStatus = getProductStatus();
             this.webDriver.quit();
 
@@ -93,15 +104,19 @@ public class BlueBrixxCrawler {
     private void initializeWebDriver() {
         /*
         Chrome local without Docker Container
+        Check Version and update driver if not works!
+
 
         System.setProperty("webdriver.chrome.driver", "/home/dtiefenbach//Downloads/chromedriver_linux64/chromedriver");
         this.webDriver = new ChromeDriver();
-        this.webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));*/
+        this.webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+
+        */
 
         ChromeOptions chromeOptions = new ChromeOptions();
         try {
             this.webDriver = new RemoteWebDriver(new URL(driverUrl), chromeOptions);
-            this.webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(30));
+            this.webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
