@@ -31,7 +31,7 @@ public class BlueBrixxCrawler {
     @Value("${proxy.url}")
     private String proxyUrl;
 
-    public synchronized Product getProduct(String productUrl) {
+    public synchronized Product getProduct(String productUrl) throws TimeoutException {
         try {
             initializeWebDriver();
 
@@ -51,8 +51,6 @@ public class BlueBrixxCrawler {
                 product.setSetNumber(matcher.group(0));
             }
 
-            this.webDriver.quit();
-
             return product;
         } catch (TimeoutException e){
             throw e;
@@ -61,7 +59,7 @@ public class BlueBrixxCrawler {
         }
     }
 
-    public synchronized ProductStatus getProductStatus(String productUrl) {
+    public synchronized ProductStatus getProductStatus(String productUrl) throws TimeoutException {
         try {
             initializeWebDriver();
 
@@ -82,7 +80,7 @@ public class BlueBrixxCrawler {
 
     private ProductStatus getProductStatus() {
         try {
-            webDriver.findElement(By.className("informAvailable_button_container"));
+            webDriver.findElement(By.className("informAvailable"));
         } catch (NoSuchElementException ex) {
             return ProductStatus.AVAILABLE;
         }
@@ -116,7 +114,7 @@ public class BlueBrixxCrawler {
         ChromeOptions chromeOptions = new ChromeOptions();
         try {
             this.webDriver = new RemoteWebDriver(new URL(driverUrl), chromeOptions);
-            this.webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(60));
+            this.webDriver.manage().timeouts().pageLoadTimeout(Duration.ofSeconds(120));
         } catch (MalformedURLException e) {
             e.printStackTrace();
         }
