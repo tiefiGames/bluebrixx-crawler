@@ -67,10 +67,7 @@ public class BlueBrixxCrawler {
             webDriver.findElement(By.xpath("(//input[@placeholder='Enter Url'])[1]")).sendKeys(productUrl);
             webDriver.findElement(By.xpath("(//button)[1]")).click();
 
-            ProductStatus productStatus = getProductStatus();
-            this.webDriver.quit();
-
-            return productStatus;
+            return getProductStatus();
         } catch (TimeoutException e){
             throw e;
         } finally {
@@ -80,23 +77,23 @@ public class BlueBrixxCrawler {
 
     private ProductStatus getProductStatus() {
         try {
-            webDriver.findElement(By.className("informAvailable"));
+            webDriver.findElement(By.className("addItemCart"));
         } catch (NoSuchElementException ex) {
-            return ProductStatus.AVAILABLE;
+            WebElement webElement = webDriver.findElement(By.xpath("//div[@class='mainPicContainer']/*[last()]"));
+            logger.info("text: {}", webElement.getText());
+            switch (webElement.getText()) {
+                case "ZURZEIT VERGRIFFEN":
+                    return ProductStatus.NOT_AVAILABLE;
+                case "BALD ERHÄLTLICH!":
+                    return ProductStatus.SOON_AVAILABLE;
+                case "ANKÜNDIGUNG":
+                    return ProductStatus.ANNOUNCEMENT;
+                default:
+                    return ProductStatus.UNKNOWN;
+            }
         }
 
-        WebElement webElement = webDriver.findElement(By.xpath("//div[@class='mainPicContainer']/*[last()]"));
-        logger.info("text: {}", webElement.getText());
-        switch (webElement.getText()) {
-            case "ZURZEIT VERGRIFFEN":
-                return ProductStatus.NOT_AVAILABLE;
-            case "BALD ERHÄLTLICH!":
-                return ProductStatus.SOON_AVAILABLE;
-            case "ANKÜNDIGUNG":
-                return ProductStatus.ANNOUNCEMENT;
-            default:
-                return ProductStatus.UNKNOWN;
-        }
+        return ProductStatus.AVAILABLE;
     }
 
     private void initializeWebDriver() {
